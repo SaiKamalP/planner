@@ -12,9 +12,6 @@ namespace Animator
         protected:
         virtual double progressNormalization(double timeProgress)=0;
         public:
-        /**
-         * While implementing the interface the first two parameters are to be passed to the AnimationInterface.
-        */
         AnimationInterface(TObj &obj,TRet (TObj::*funToInvoke)(double progress),double duration,double framerate);
         ~AnimationInterface();
         virtual void start() final;
