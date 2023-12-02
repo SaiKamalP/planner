@@ -44,8 +44,8 @@ namespace Animator{
         */
         void disconnect();
         public:
-        static ProgressiveFunctionInvoker<class TRet,class TObj,class TObj2>* addNewProgressiveInvocation(TObj &obj,TRet (TObj::*funToInvoke)(double progress),
-                                        TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double framerate=60);
+        static ProgressiveFunctionInvoker<TRet,TObj,TObj2>* addNewProgressiveInvocation(TObj &obj,TRet (TObj::*funToInvoke)(double progress),
+                                        TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double frameRate=60);
         /**
          * Invokes progress = 1, and ends the animation.
         */
@@ -62,7 +62,7 @@ namespace Animator{
 
     template<class TRet,class TObj> class AnimationInterface{
         private:
-        ProgressiveFunctionInvoker<class TRet,class TObj,AnimationInterface>* currentProgressiveFunctionInvoker=nullptr;
+        ProgressiveFunctionInvoker<TRet,TObj,AnimationInterface>* currentProgressiveFunctionInvoker=nullptr;
         TObj *obj;
         TRet (TObj::*functionToInvoke)(double progress);
         double duration;
@@ -73,7 +73,7 @@ namespace Animator{
         /**
          * While implementing the interface the first two parameters are to be passed to the AnimationInterface.
         */
-        AnimationInterface(TObj &obj,TRet (TObj::*funToInvoke)(double progress),double duration,double framerate=60);
+        AnimationInterface(TObj &obj,TRet (TObj::*funToInvoke)(double progress),double duration,double framerate);
         ~AnimationInterface();
         virtual void start() final;
         virtual void stop() final;
@@ -89,7 +89,7 @@ namespace Animator{
 
     // Definitions of ProgressiveFunctionInvoker functions
 
-    template<class TRet,class TObj,class TObj2> ProgressiveFunctionInvoker<TRet,TObj,TObj2>::ProgressiveFunctionInvoker(TObj &obj,TRet (TObj::*funToInvoke)(double progress),TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double framerate=60){
+    template<class TRet,class TObj,class TObj2> ProgressiveFunctionInvoker<TRet,TObj,TObj2>::ProgressiveFunctionInvoker(TObj &obj,TRet (TObj::*funToInvoke)(double progress),TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double frameRate){
         this->obj=&obj;
         this->functionToInvoke=funToInvoke;
         this->progressNormalizationFunctionObject=&progressNormalizationFunObject;
@@ -100,7 +100,9 @@ namespace Animator{
         currentTime=0;
         init();
     }
-    
+    template<class TRet,class TObj,class TObj2> ProgressiveFunctionInvoker<TRet,TObj,TObj2>::~ProgressiveFunctionInvoker(){
+
+    }
     template<class TRet,class TObj,class TObj2>void ProgressiveFunctionInvoker<TRet,TObj,TObj2>::init(){
         con=Glib::signal_timeout().connect(sigc::mem_fun(*this,&ProgressiveFunctionInvoker<TRet,TObj,TObj2>::onProgressTimeStep),timeStep);
         invokeFunctionAtTimeProgress(0);
@@ -129,7 +131,7 @@ namespace Animator{
         delete this;
     }
 
-    template<class TRet,class TObj,class TObj2> ProgressiveFunctionInvoker<TRet,TObj,TObj2>* ProgressiveFunctionInvoker<TRet,TObj,TObj2>::addNewProgressiveInvocation(TObj &obj,TRet (TObj::*funToInvoke)(double progress),TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double frameRate=60){
+    template<class TRet,class TObj,class TObj2> ProgressiveFunctionInvoker<TRet,TObj,TObj2>* ProgressiveFunctionInvoker<TRet,TObj,TObj2>::addNewProgressiveInvocation(TObj &obj,TRet (TObj::*funToInvoke)(double progress),TObj2 &progressNormalizationFunObject,double (TObj2::*progressNormalizationFun)(double timeProgress),double duration,double frameRate){
         return new ProgressiveFunctionInvoker(obj,funToInvoke,progressNormalizationFunObject,progressNormalizationFun,duration,frameRate);
     }
 
@@ -143,7 +145,7 @@ namespace Animator{
 
 
     // Definitions of AnimationInterface
-    template<class TRet,class TObj> AnimationInterface<TRet,TObj>::AnimationInterface(TObj &obj,TRet (TObj::*funToInvoke)(double progress),double duration,double framerate=60){
+    template<class TRet,class TObj> AnimationInterface<TRet,TObj>::AnimationInterface(TObj &obj,TRet (TObj::*funToInvoke)(double progress),double duration,double framerate){
         this->obj=&obj;
         this->functionToInvoke=funToInvoke;
         this->duration=duration;
