@@ -1,3 +1,4 @@
+#pragma once
 #include<glibmm.h>
 namespace Animator{
     /**
@@ -106,7 +107,7 @@ namespace Animator{
     }
 
     template<class TRet,class TObj,class TObj2>void ProgressiveFunctionInvoker<TRet,TObj,TObj2>::invokeFunctionAtTimeProgress(double timeProgress){
-        (obj->*functionToInvoke)((progressNormalizationFunctionObject->*progressNormalizationFunction)(0));
+        (obj->*functionToInvoke)((progressNormalizationFunctionObject->*progressNormalizationFunction)(timeProgress));
     }
 
     template<class TRet,class TObj,class TObj2>bool ProgressiveFunctionInvoker<TRet,TObj,TObj2>::onProgressTimeStep(){
